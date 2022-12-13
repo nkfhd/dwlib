@@ -8,4 +8,9 @@ class MethodChannelDwlib extends DwlibPlatform {
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('dwlib');
+
+  @override
+  Future<dynamic> getList() async {
+    return await methodChannel.invokeMethod('get_list');
+  }
 }

@@ -22,4 +22,8 @@ abstract class DwlibPlatform extends PlatformInterface {
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
   }
+
+  Future<dynamic> getList() {
+    throw UnimplementedError('getList() has not been implemented.');
+  }
 }

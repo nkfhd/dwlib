@@ -1,0 +1,29 @@
+PODS:
+  - Alamofire (4.9.1)
+  - dwlib (0.0.1):
+    - Alamofire (= 4.9.1)
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - dwlib (from `.symlinks/plugins/dwlib/ios`)
+  - Flutter (from `Flutter`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+
+EXTERNAL SOURCES:
+  dwlib:
+    :path: ".symlinks/plugins/dwlib/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  dwlib: 956067dbb2c1cca1340bd0e32161fcdf64b6e351
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+
+PODFILE CHECKSUM: 130fea0bdf1c32474e358b23730c718371340e33
+
+COCOAPODS: 1.11.3
