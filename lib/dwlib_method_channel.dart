@@ -13,4 +13,9 @@ class MethodChannelDwlib extends DwlibPlatform {
   Future<dynamic> getList() async {
     return await methodChannel.invokeMethod('get_list');
   }
+
+  @override
+  Future<dynamic> start() async {
+    return await methodChannel.invokeMethod('start');
+  }
 }

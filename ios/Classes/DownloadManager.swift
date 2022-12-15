@@ -66,7 +66,7 @@ class DownloadManger: NSObject {
     }
     
     private lazy var backgroundManager: Alamofire.SessionManager = {
-        let bundleIdentifier = "media.news.app"
+        let bundleIdentifier = "org.cocoapods.dwlib"
         return Alamofire.SessionManager(configuration: URLSessionConfiguration.background(withIdentifier: bundleIdentifier + ".background"))
     }()
     
@@ -87,9 +87,10 @@ class DownloadManger: NSObject {
         print("Download Queue Count is : \(queue.operationCount)")
     }
     
-    func download(id: String, url: String,fileName: String? = nil, whereToSave: String){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
+    func download(id: String, url: String,fileName: String? = nil, whereToSave: String,result: @escaping FlutterResult){
+        let appDelegate = SwiftDwlibPlugin.shared!
+        guard let context = appDelegate.getAppDelegateContext()  else {return}
+        
         let download = Download(context: context)
         if let url = URL(string: url){
             download.title = fileName ?? UUID.init().uuidString
@@ -110,14 +111,14 @@ class DownloadManger: NSObject {
             // TODO callback to flutter with invalide url error
         }
     }
-
+    
     func downloadItemDetails(id: String) -> [String: Any?]?{
         return generateJsonFromDownload(getDownloadItem(id: id))
     }
-
+    
     func allItems() -> [[String: Any?]]? {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
+        let appDelegate = SwiftDwlibPlugin.shared!
+        guard let context = SwiftDwlibPlugin.shared.getAppDelegateContext()  else { return nil}
         let fetchRequest = NSFetchRequest<Download>(entityName: Constants.CoreData.downloadEntityName)
         let sort = NSSortDescriptor(key: #keyPath(Download.createdAt), ascending: false)
         fetchRequest.sortDescriptors = [sort]
@@ -134,10 +135,10 @@ class DownloadManger: NSObject {
             return nil
         }
     }
-
+    
     func allDownloadItems() -> [Download]?{
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
+        let appDelegate = SwiftDwlibPlugin.shared!
+        guard let context = appDelegate.getAppDelegateContext()  else { return nil}
         let fetchRequest = NSFetchRequest<Download>(entityName: Constants.CoreData.downloadEntityName)
         let sort = NSSortDescriptor(key: #keyPath(Download.createdAt), ascending: false)
         fetchRequest.sortDescriptors = [sort]
@@ -154,9 +155,9 @@ class DownloadManger: NSObject {
             return nil
         }
     }
-
+    
     func pause(id: String){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let appDelegate = SwiftDwlibPlugin.shared!
         if let download = getDownloadItem(id: id){
             if let downloadRequest = downloadRequestes[id]{
                 if let resumeData = downloadRequest.resumeData{
@@ -170,7 +171,7 @@ class DownloadManger: NSObject {
                 download.status = DownloadStatus.paused.rawValue
                 downloadRequest.suspend()
             }else{
-                 print("No Resume")
+                print("No Resume")
                 download.status = DownloadStatus.paused.rawValue
                 appDelegate.saveContext()
                 // TODO callback to flutter with error no download request found cannt pause
@@ -181,9 +182,9 @@ class DownloadManger: NSObject {
         }
         appDelegate.saveContext()
     }
-
+    
     func resume(id: String, pathExtension: String? = nil, whereToSave: String){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let appDelegate = SwiftDwlibPlugin.shared!
         if let download = getDownloadItem(id: id){
             if let downloadRequeste = downloadRequestes[id]{
                 downloadRequeste.resume()
@@ -201,9 +202,9 @@ class DownloadManger: NSObject {
             // TODO callback to flutter with error no download found
         }
     }
-
+    
     func stop (id: String){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let appDelegate = SwiftDwlibPlugin.shared!
         if let download = getDownloadItem(id: id){
             if let downloadRequest = downloadRequestes[id]{
                 print("Enter stopped success")
@@ -222,7 +223,7 @@ class DownloadManger: NSObject {
         }
         appDelegate.saveContext()
     }
-
+    
     func retry (id: String, pathExtension: String? = nil, whereToSave: String){
         if let download = getDownloadItem(id: id){
             startDownload(download, whereToSave: whereToSave)
@@ -230,12 +231,12 @@ class DownloadManger: NSObject {
             // TODO callback to flutter with error no download found
         }
     }
-
-
+    
+    
     func delete (id: String){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let appDelegate = SwiftDwlibPlugin.shared!
         if let download = getDownloadItem(id: id){
-            let context = appDelegate.persistentContainer.viewContext
+            guard let context = appDelegate.getAppDelegateContext()  else { return }
             context.delete(download)
             appDelegate.saveContext()
         }else{
@@ -243,12 +244,11 @@ class DownloadManger: NSObject {
             // TODO callback to flutter with error no download found
         }
     }
-
-
-    // MARK:- Helper Methods
+    
+    
     private func startDownload(_ download: Download, whereToSave: String){
         print("whereToSave", whereToSave)
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let appDelegate = SwiftDwlibPlugin.shared!
         let destination: DownloadRequest.DownloadFileDestination = { temporaryURL, _ in
             _ = URL.createFolder(folderName: whereToSave)!
             let fileName: String
@@ -283,10 +283,10 @@ class DownloadManger: NSObject {
         }
         downloadRequestes[download.id!] = downloadRequest
     }
-
+    
     private func resumeDownload(_ download: Download, resumeData: Data, whereToSave: String){
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
+        let appDelegate = SwiftDwlibPlugin.shared!
+        
         let destination: DownloadRequest.DownloadFileDestination = { temporaryURL, _ in
             _ = URL.createFolder(folderName: whereToSave)!
             let fileName: String
@@ -304,39 +304,39 @@ class DownloadManger: NSObject {
             .downloadProgress { (progress) in
                 download.progress = progress.fractionCompleted
                 appDelegate.saveContext()
-        }.response {(response) in
-            if let error = response.error{
-                print("Error in resuming");
-                print(error)
-                if let resumeData = response.resumeData {
-                    download.status = DownloadStatus.paused.rawValue
-                    self.cache.setObject(resumeData as NSData, forKey: download.id! as NSString)
-                    appDelegate.saveContext()
+            }.response {(response) in
+                if let error = response.error{
+                    print("Error in resuming");
+                    print(error)
+                    if let resumeData = response.resumeData {
+                        download.status = DownloadStatus.paused.rawValue
+                        self.cache.setObject(resumeData as NSData, forKey: download.id! as NSString)
+                        appDelegate.saveContext()
+                    }else{
+                        download.status = DownloadStatus.failed.rawValue
+                        appDelegate.saveContext()
+                    }
                 }else{
+                    print("Error with delete")
                     download.status = DownloadStatus.failed.rawValue
                     appDelegate.saveContext()
+                    // TODO callback to flutter with response.error
+                    //self.delete(id: download.id!)
                 }
-            }else{
-                print("Error with delete")
-                download.status = DownloadStatus.failed.rawValue
-                appDelegate.saveContext()
-                // TODO callback to flutter with response.error
-                //self.delete(id: download.id!)
             }
-        }
         downloadRequestes[download.id!] = downloadRequest
     }
-
-
-
+    
+    
+    
     private func generateJsonFromDownload(_ download: Download?) -> [String: Any?]?{
         guard let download = download else { return nil}
         return ["id": download.id, "title": download.title, "url": download.url, "progress": download.progress,"status": download.status]
     }
-
+    
     func getDownloadItem(id: String) -> Download?{
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
+        let appDelegate = SwiftDwlibPlugin.shared!
+        guard let context = appDelegate.getAppDelegateContext()  else { return nil}
         let fetchRequest = NSFetchRequest<Download>(entityName: Constants.CoreData.downloadEntityName)
         fetchRequest.predicate = NSPredicate(format: "id = %@", id)
         do{
@@ -347,8 +347,4 @@ class DownloadManger: NSObject {
             return nil
         }
     }
-}
-
-protocol DownloadManagerDelegate {
-   func getAppDelegateContext
 }

@@ -25,6 +25,10 @@ class _MyAppState extends State<MyApp> {
     var list = await _dwlibPlugin.getList();
     print(list);
   }
+  _start() async {
+    var list = await _dwlibPlugin.start();
+    print(list);
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,6 +39,10 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Column(
             children: [
+              ElevatedButton(
+                onPressed: _start,
+                child: const Text('start'),
+              ),
               ElevatedButton(
                 onPressed: _getList,
                 child: const Text('get list'),

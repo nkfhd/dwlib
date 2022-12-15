@@ -26,4 +26,8 @@ abstract class DwlibPlatform extends PlatformInterface {
   Future<dynamic> getList() {
     throw UnimplementedError('getList() has not been implemented.');
   }
+
+  Future<dynamic> start() {
+    throw UnimplementedError('start() has not been implemented.');
+  }
 }
