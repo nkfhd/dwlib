@@ -43,4 +43,9 @@ class MethodChannelDwlib extends DwlibPlatform {
   Future<dynamic> retry(Map<String, dynamic> data) async {
     return await methodChannel.invokeMethod('retry', data);
   }
+
+  @override
+  Future<dynamic> deleteLocal(Map<String, dynamic> data) async {
+    return await methodChannel.invokeMethod('delete_local', data);
+  }
 }

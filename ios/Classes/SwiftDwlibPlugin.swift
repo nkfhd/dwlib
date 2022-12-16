@@ -48,6 +48,9 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
         case "retry":
             self.retry(result: result, call: call)
             break;
+        case "delete_local":
+            self.deleteLocal(result: result, call: call)
+            break;
         default:
             print("method wasn't found : ",call.method);
             result("method wasn't found : "+call.method)
@@ -172,6 +175,24 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
         result(false)
     }
     
+    func deleteLocal(result: @escaping FlutterResult,call: FlutterMethodCall){
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String
+        {
+            if let download = DownloadManger.shared.getDownloadItem(id: id){
+                if let strVideoURL = download.localFile {
+                    print(strVideoURL)
+                    let videoURL = strVideoURL.localURL
+                    _ = self.deleteLocalFilePath(filePath: videoURL)
+                }
+            }
+        }
+        result(true)
+    }
+    
     func json(from object:Any) -> String? {
         guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else {
             return nil
@@ -200,6 +221,18 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
             }
         }
         return activeCount
+    }
+    
+    func deleteLocalFilePath(filePath : URL?)->Bool{
+        do {
+            try FileManager.default.removeItem(at: filePath!)
+            print("deleteLocalVideo File deleted")
+            return true
+        }
+        catch {
+            print("deleteLocalVideoError")
+        }
+        return false
     }
 }
 

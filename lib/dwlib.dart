@@ -28,4 +28,8 @@ class Dwlib {
   Future<dynamic> retry(Map<String, dynamic> data) {
     return DwlibPlatform.instance.retry(data);
   }
+
+  Future<dynamic> deleteLocal(Map<String, dynamic> data) {
+    return DwlibPlatform.instance.deleteLocal(data);
+  }
 }

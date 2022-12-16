@@ -85,6 +85,14 @@ class _MyAppState extends State<MyApp> {
     print(list);
   }
 
+  _deleteLocal() async {
+    Map<String, dynamic> data = {
+      "id": "205728",
+    };
+    var list = await _dwlibPlugin.deleteLocal(data);
+    print(list);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -128,6 +136,16 @@ class _MyAppState extends State<MyApp> {
                   ElevatedButton(
                     onPressed: _retry,
                     child: const Text('retry'),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _deleteLocal,
+                    child: const Text('delete local file'),
                   ),
                 ],
               ),
