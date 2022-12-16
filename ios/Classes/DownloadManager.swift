@@ -87,7 +87,7 @@ class DownloadManger: NSObject {
         print("Download Queue Count is : \(queue.operationCount)")
     }
     
-    func download(id: String, url: String,fileName: String? = nil, whereToSave: String,result: @escaping FlutterResult){
+    func download(id: String, url: String,fileName: String? = nil, whereToSave: String){
         let appDelegate = SwiftDwlibPlugin.shared!
         guard let context = appDelegate.getAppDelegateContext()  else {return}
         

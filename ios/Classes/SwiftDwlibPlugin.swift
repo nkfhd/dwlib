@@ -24,7 +24,7 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let flutterViewController: UIViewController =
+        let _: UIViewController =
         (UIApplication.shared.delegate?.window??.rootViewController)!;
         switch(call.method){
         case "get_list":
@@ -33,43 +33,144 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
         case "start":
             self.start(result: result, call: call)
             break;
+        case "pause":
+            self.pause(result: result, call: call)
+            break;
+        case "resume":
+            self.resume(result: result, call: call)
+            break;
+        case "cancel":
+            self.cancel(result: result, call: call)
+            break;
+        case "delete":
+            self.delete(result: result, call: call)
+            break;
+        case "retry":
+            self.retry(result: result, call: call)
+            break;
         default:
             print("method wasn't found : ",call.method);
             result("method wasn't found : "+call.method)
         }
     }
     
-        func getList(result: @escaping FlutterResult){
-            let allItems = DownloadManger.shared.allItems() ?? [[String: Any]]()
-            result(self.json(from:allItems as Any))
-        }
+    func getList(result: @escaping FlutterResult){
+        let allItems = DownloadManger.shared.allItems() ?? [[String: Any]]()
+        result(self.json(from:allItems as Any))
+    }
     
     
     func start(result: @escaping FlutterResult,call: FlutterMethodCall){
-        DownloadManger.shared.download(id: "111", url: "https://thekee.gcdn.co/video/m-159n/English/Animation&Family/Baby.Shark.Best.Kids.Song/S01/01.mp4", fileName: "test.mp4",whereToSave: "77810/205728",result: result)
-        result(true)
-        //        guard let args = call.arguments else {
-        //            return
-        //        }
-        //        if let myArgs = args as? [String: Any],
-        //           let id : String = myArgs["id"] as? String,
-        //           let url : String = myArgs["link"] as? String,
-        //           let fileName : String = myArgs["fileName"] as? String,
-        //           let whereToSave : String = myArgs["savedDir"] as? String{
-        //            if self.getActiveCount() <= 5 {
-        //                DownloadManger.shared.download(id: id, url: url, fileName: fileName,whereToSave: whereToSave)
-        //                result(true)
-        //            } else {
-        //                result(false)
-        //            }
-        //
-        //        } else {
-        //            print("iOS could not extract flutter arguments in method: (startDownload)")
-        //            result(false)
-        //        }
-        //        result(false)
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String,
+           let url : String = myArgs["link"] as? String,
+           let fileName : String = myArgs["fileName"] as? String,
+           let whereToSave : String = myArgs["savedDir"] as? String{
+            if self.getActiveCount() <= 5 {
+                DownloadManger.shared.download(id: id, url: url, fileName: fileName,whereToSave: whereToSave)
+                result(true)
+            } else {
+                result(false)
+            }
+            
+        } else {
+            print("iOS could not extract flutter arguments in method: (startDownload)")
+            result(false)
+        }
+        result(false)
     }
     
+    
+    func pause(result: @escaping FlutterResult,call: FlutterMethodCall){
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String
+        {
+            DownloadManger.shared.pause(id: id)
+            result(true)
+        } else {
+            print("iOS could not extract flutter arguments in method: (pauseDownloadItem)")
+            result(false)
+        }
+    }
+    
+    func resume(result: @escaping FlutterResult,call: FlutterMethodCall){
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String,
+           let whereToSave : String = myArgs["savedDir"] as? String{
+            if self.getActiveCount() <= 5 {
+                DownloadManger.shared.resume(id: id,whereToSave: whereToSave)
+                result(true)
+            } else {
+                result(false)
+            }
+            
+        } else {
+            print("iOS could not extract flutter arguments in method: (resumeDownloadItem)")
+            result(false)
+        }
+    }
+    
+    func cancel(result: @escaping FlutterResult,call: FlutterMethodCall){
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String
+        {
+            DownloadManger.shared.stop(id: id)
+            result(true)
+        } else {
+            print("iOS could not extract flutter arguments in method: (cancelDownloadItem)")
+            result(false)
+        }
+    }
+    
+    func delete(result: @escaping FlutterResult,call: FlutterMethodCall){
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String
+        {
+            DownloadManger.shared.delete(id: id)
+            result(true)
+        } else {
+            print("iOS could not extract flutter arguments in method: (deleteDownloadItem)")
+            result(false)
+        }
+        result(false)
+    }
+    
+    func retry(result: @escaping FlutterResult,call: FlutterMethodCall){
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String,
+           let whereToSave : String = myArgs["savedDir"] as? String
+        {
+            if self.getActiveCount() <= 5 {
+                DownloadManger.shared.retry(id: id, whereToSave: whereToSave)
+                result(true)
+            } else {
+                result(false)
+            }
+            result(true)
+        } else {
+            print("iOS could not extract flutter arguments in method: (retryDownloadItem)")
+            result(false)
+        }
+        result(false)
+    }
     
     func json(from object:Any) -> String? {
         guard let data = try? JSONSerialization.data(withJSONObject: object, options: []) else {
@@ -77,17 +178,6 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
         }
         return String(data: data, encoding: String.Encoding.utf8)
     }
-    
-    
-    //     lazy var persistentContainer: NSPersistentContainer = {
-    //         let container = NSPersistentContainer(name: Constants.CoreData.containerName)
-    //         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-    //             if let error = error as NSError? {
-    //                 fatalError("Unresolved error \(error), \(error.userInfo)")
-    //             }
-    //         })
-    //         return container
-    //     }()
     
     func saveContext () {
         guard let context = getAppDelegateContext() else { return }
@@ -101,6 +191,16 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
         }
     }
     
+    func getActiveCount() -> Int{
+        let allItems = DownloadManger.shared.allDownloadItems() ?? [Download]()
+        var activeCount = 0
+        for item in allItems {
+            if item.status == DownloadManger.DownloadStatus.active.rawValue {
+                activeCount = activeCount + 1
+            }
+        }
+        return activeCount
+    }
 }
 
 public protocol SwiftDwlibPluginDelegate {

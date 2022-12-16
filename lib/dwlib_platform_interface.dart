@@ -27,7 +27,27 @@ abstract class DwlibPlatform extends PlatformInterface {
     throw UnimplementedError('getList() has not been implemented.');
   }
 
-  Future<dynamic> start() {
+  Future<dynamic> start(Map<String, dynamic> data) {
     throw UnimplementedError('start() has not been implemented.');
+  }
+
+  Future<dynamic> pause(Map<String, dynamic> data) {
+    throw UnimplementedError('pause() has not been implemented.');
+  }
+
+  Future<dynamic> resume(Map<String, dynamic> data) {
+    throw UnimplementedError('resume() has not been implemented.');
+  }
+
+  Future<dynamic> cancel(Map<String, dynamic> data) {
+    throw UnimplementedError('cancel() has not been implemented.');
+  }
+
+  Future<dynamic> delete(Map<String, dynamic> data) {
+    throw UnimplementedError('delete() has not been implemented.');
+  }
+
+  Future<dynamic> retry(Map<String, dynamic> data) {
+    throw UnimplementedError('retry() has not been implemented.');
   }
 }
