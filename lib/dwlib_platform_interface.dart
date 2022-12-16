@@ -54,4 +54,8 @@ abstract class DwlibPlatform extends PlatformInterface {
   Future<dynamic> deleteLocal(Map<String, dynamic> data) {
     throw UnimplementedError('deleteLocal() has not been implemented.');
   }
+
+  Future<dynamic> openFile(Map<String, dynamic> data) {
+    throw UnimplementedError('openFile() has not been implemented.');
+  }
 }

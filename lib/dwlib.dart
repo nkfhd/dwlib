@@ -32,4 +32,8 @@ class Dwlib {
   Future<dynamic> deleteLocal(Map<String, dynamic> data) {
     return DwlibPlatform.instance.deleteLocal(data);
   }
+
+  Future<dynamic> openFile(Map<String, dynamic> data) {
+    return DwlibPlatform.instance.openFile(data);
+  }
 }

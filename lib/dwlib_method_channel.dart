@@ -48,4 +48,9 @@ class MethodChannelDwlib extends DwlibPlatform {
   Future<dynamic> deleteLocal(Map<String, dynamic> data) async {
     return await methodChannel.invokeMethod('delete_local', data);
   }
+
+  @override
+  Future<dynamic> openFile(Map<String, dynamic> data) async {
+    return await methodChannel.invokeMethod('open_file', data);
+  }
 }

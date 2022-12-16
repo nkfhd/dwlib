@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import CoreData
+import AVKit
 
 public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
     static var shared : SwiftDwlibPlugin!
@@ -24,7 +25,7 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let _: UIViewController =
+        let controller: UIViewController =
         (UIApplication.shared.delegate?.window??.rootViewController)!;
         switch(call.method){
         case "get_list":
@@ -50,6 +51,9 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
             break;
         case "delete_local":
             self.deleteLocal(result: result, call: call)
+            break;
+        case "open_file":
+            self.openFile(result: result, call: call,controller: controller)
             break;
         default:
             print("method wasn't found : ",call.method);
@@ -191,6 +195,39 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
             }
         }
         result(true)
+    }
+    
+    func openFile(result: @escaping FlutterResult,call: FlutterMethodCall,controller : UIViewController){
+        guard let args = call.arguments else {
+            return
+        }
+        if let myArgs = args as? [String: Any],
+           let id : String = myArgs["id"] as? String
+        {
+            if let download = DownloadManger.shared.getDownloadItem(id: id){
+                if let strVideoURL = download.localFile {
+                    print(strVideoURL)
+                    let videoURL = strVideoURL.localURL
+                    let OfflinePlayer = AVPlayer(url: videoURL!)
+                    let playerViewController = AVPlayerViewController()
+                    playerViewController.player = OfflinePlayer
+                    controller.present(playerViewController, animated: true) {
+                        try! AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback, options: [])
+                        playerViewController.player!.play()
+                        UIApplication.shared.isIdleTimerDisabled = true
+                    }
+                } else {
+                    print("No Local file found")
+                }
+            }else{
+                print("No download file found")
+            }
+            result(true)
+        } else {
+            print("iOS could not extract flutter arguments in method: (startOfflineVideo)")
+            result(false)
+        }
+        result(false)
     }
     
     func json(from object:Any) -> String? {

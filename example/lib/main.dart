@@ -93,6 +93,14 @@ class _MyAppState extends State<MyApp> {
     print(list);
   }
 
+  _open() async {
+    Map<String, dynamic> data = {
+      "id": "205728",
+    };
+    var list = await _dwlibPlugin.openFile(data);
+    print(list);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -146,6 +154,10 @@ class _MyAppState extends State<MyApp> {
                   ElevatedButton(
                     onPressed: _deleteLocal,
                     child: const Text('delete local file'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _open,
+                    child: const Text('open local file'),
                   ),
                 ],
               ),
