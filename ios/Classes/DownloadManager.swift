@@ -66,7 +66,7 @@ class DownloadManger: NSObject {
     }
     
     private lazy var backgroundManager: Alamofire.SessionManager = {
-        let bundleIdentifier = "com.dwlib.dwlib"
+        let bundleIdentifier = "org.cocoapods.dwlib"
         return Alamofire.SessionManager(configuration: URLSessionConfiguration.background(withIdentifier: bundleIdentifier + ".background"))
     }()
     

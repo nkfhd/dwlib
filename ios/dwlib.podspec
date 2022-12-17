@@ -9,7 +9,6 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 A new Flutter plugin project.
                        DESC
-  s.info_plist = { 'CFBundleIdentifier' => 'com.dwlib.dwlib', 'CFBundleVersion' => '1', 'CFBundleShortVersionString' => '0.0.1' }
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
