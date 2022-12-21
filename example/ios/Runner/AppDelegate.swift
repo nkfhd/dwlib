@@ -22,12 +22,12 @@ import CoreData
         // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
         let appKitBundle = Bundle(identifier: "org.cocoapods.dwlib")
         
-        let modelURL = appKitBundle!.url(forResource: "Download", withExtension: "momd")!
+        let modelURL = appKitBundle!.url(forResource: "Cache", withExtension: "momd")!
         return NSManagedObjectModel(contentsOf: modelURL)!
     }()
     
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Download", managedObjectModel: managedObjectModel)
+        let container = NSPersistentContainer(name: "Cache", managedObjectModel: managedObjectModel)
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
