@@ -4,7 +4,7 @@ import CoreData
 import AVKit
 
 public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
-    static var shared : SwiftDwlibPlugin!
+    public static var shared : SwiftDwlibPlugin!
     
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -20,9 +20,6 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
         return appDelegate?.getContext()
     }
     
-    public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        
-    }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let controller: UIViewController =
@@ -270,6 +267,38 @@ public class SwiftDwlibPlugin: NSObject, FlutterPlugin {
             print("deleteLocalVideoError")
         }
         return false
+    }
+
+    public func initConfigurations(){
+        DownloadManger.shared.setupDownloadQueue()
+        let allItems = DownloadManger.shared.allDownloadItems() ?? [Download]()
+        for item in allItems {
+            if item.status == DownloadManger.DownloadStatus.active.rawValue {
+                guard let itemId = item.id else {
+                    continue
+                }
+                DownloadManger.shared.pause(id: itemId)
+            }
+
+            if item.status == nil {
+                guard let itemId = item.id else {
+                    continue
+                }
+                DownloadManger.shared.pause(id: itemId)       
+            }
+        }
+    }
+
+    public func applicationWillTerminate() {
+      let allItems = DownloadManger.shared.allDownloadItems() ?? [Download]()
+      for item in allItems {
+          if item.status == DownloadManger.DownloadStatus.active.rawValue {
+              guard let itemId = item.id else {
+                  continue
+              }
+              DownloadManger.shared.pause(id: itemId)
+          }
+      }
     }
 }
 
