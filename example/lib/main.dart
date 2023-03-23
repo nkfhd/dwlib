@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
     Map<String, dynamic> data = {
       "id": "205728",
       "link":
-          "https://s-ed1.cloud.gcore.lu/video/m-159n/English/Animation&Family/Baby.Shark.Best.Kids.Song/S01/02.mp4",
+          "https://s3.eu-central-1.wasabisys.com/bu26032021/m-159n/English/Animation&Family/Baby.Shark.Best.Kids.Song/S01/02.mp4",
       "fileName": "02.mp4",
       "savedDir": "77810/205728"
     };

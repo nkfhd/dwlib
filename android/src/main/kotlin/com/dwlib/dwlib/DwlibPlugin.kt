@@ -70,6 +70,73 @@ class DwlibPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             } else {
                 result.success(false)
             }
+        } else if (call.method == "pause") {
+            var id: String? = call.argument("id")
+            var item = usersDBHelper.getDownloadItem(id).get(0)
+            item.status = "paused"
+            usersDBHelper.updateDownloadItem(item)
+            downloader?.pauseDownload()
+            result.success(true)
+        } else if (call.method == "resume") {
+            var id: String? = call.argument("id")
+            var item = usersDBHelper.getDownloadItem(id).get(0)
+            item.status = "active"
+            usersDBHelper.updateDownloadItem(item)
+            getDownloader(item.id)
+            downloader?.resumeDownload()
+            result.success(true)
+        } else if (call.method == "cancel") {
+            var id: String? = call.argument("id")
+            var item = usersDBHelper.getDownloadItem(id).get(0)
+            item.status = "stoped"
+            usersDBHelper.updateDownloadItem(item)
+            downloader?.cancelDownload()
+            result.success(true)
+        } else if (call.method == "delete") {
+            var id: String? = call.argument("id")
+            var item = usersDBHelper.getDownloadItem(id).get(0)
+            usersDBHelper.deleteDownloadItem(item.id)
+            downloader?.cancelDownload()
+            result.success(true)
+        } else if (call.method == "retry") {
+            var id: String? = call.argument("id")
+            var item = usersDBHelper.getDownloadItem(id).get(0)
+            item.status = "active"
+            usersDBHelper.updateDownloadItem(item)
+            getDownloader(item.id)
+            downloader?.download()
+            result.success(true)
+        } else if (call.method == "delete_local") {
+            var id: String? = call.argument("id")
+            var item = usersDBHelper.getDownloadItem(id).get(0)
+            val uri = URI(item.localFile)
+            val path = uri.getPath()
+            val ThefileName = path.substring(path.lastIndexOf('/') + 1).substringBeforeLast('.')
+            val ext = path.substring(path.lastIndexOf('/') + 1).substringAfterLast('.')
+            var sb = StringBuilder()
+            sb.append(context.filesDir.absolutePath)
+            sb.append(java.io.File.separator)
+            sb.append(ThefileName)
+            sb.append(".")
+            sb.append(ext)
+            var file: File = File(sb.toString())
+            if (file.exists()) {
+                var isDeleted = file.delete()
+            } else {
+                var sb = StringBuilder()
+                sb.append(context.getExternalFilesDir(null))
+                sb.append(java.io.File.separator)
+                sb.append(item.localFile.toString().replace("/", java.io.File.separator))
+                sb.append(java.io.File.separator)
+                sb.append(ThefileName)
+                sb.append(".")
+                sb.append(ext)
+                var file: File = File(sb.toString())
+                if (file.exists()) {
+                    var isDeleted = file.delete()
+                }
+            }
+            result.success(true)
         } else {
             result.notImplemented()
         }
@@ -108,13 +175,24 @@ class DwlibPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val path = uri.getPath()
         val ThefileName = id.toString()
         val ext = "mp4"
-        val permissionCheckStorage = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permissionCheckStorage =
+            ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (permissionCheckStorage != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                0
+            )
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) !== PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                0)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) !== PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                0
+            )
         }
         val sd_main = File(context.filesDir.absolutePath)
         var success = true
@@ -177,7 +255,6 @@ class DwlibPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
 
     }
-
 
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
