@@ -143,17 +143,6 @@ class DwlibPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
 
-    private fun checkStoragePermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(
-                activity,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                STORAGE_PERMISSION_CODE
-            )
-        }
-    }
-
-
     private fun getActiveConnections(): Int {
         var activeConnections: Int = 0
         var downloadUrlList = usersDBHelper.getAllDownloadItems()
@@ -175,25 +164,6 @@ class DwlibPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val path = uri.getPath()
         val ThefileName = id.toString()
         val ext = "mp4"
-        val permissionCheckStorage =
-            ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        if (permissionCheckStorage != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                activity,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                0
-            )
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) !== PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                activity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                0
-            )
-        }
         val sd_main = File(context.filesDir.absolutePath)
         var success = true
         if (!sd_main.exists()) {
@@ -265,7 +235,6 @@ class DwlibPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         activity = binding.activity
         usersDBHelper = UsersDBHelper(context)
         sharedPref = context.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
-        checkStoragePermissions()
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
