@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:dwlib/dwlib.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -25,7 +25,15 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  Future<void> requestPermission(Permission permission) async {
+    final status = await permission.request();
+    setState(() {
+      print(status);
+    });
+  }
+
   _getList() async {
+    requestPermission(Permission.storage);
     await _dwlibPlugin.getList().then((itemsString) {
       print(itemsString);
       if (itemsString != null) {
